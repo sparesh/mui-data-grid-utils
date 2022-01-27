@@ -85,8 +85,6 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
     append(compositeFactory.create());
   };
 
-  console.log(mdiTableColumnPlusAfter);
-
   return (
     <CssGrid sx={{ gridTemplateColumns: "auto auto" }}>
       <Stack sx={{ gridColumn: "span 2" }}>
