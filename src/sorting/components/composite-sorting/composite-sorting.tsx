@@ -50,7 +50,7 @@ export const CompositeSorting = (props: CompositeSortingProps) => {
   const handleDragEnd = ({ destination, source }: DropResult) => {
     if (!destination) return;
 
-    const result = Array.from(getValues(props.formPath));
+    const result = Array.from(getValues(props.formPath)).filter(Boolean);
     const [removed] = result.splice(source.index, 1);
     result.splice(destination.index, 0, removed);
 
@@ -97,45 +97,36 @@ export const CompositeSorting = (props: CompositeSortingProps) => {
             <NoAppliedSorting />
           </Box>
         ) : null}
-        <List disablePadding>
-          <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId={props.formPath}>
-              {(provided) => (
-                <div ref={provided.innerRef} {...provided.droppableProps}>
-                  {fields.map((field, i) => (
-                    <Draggable draggableId={`${props.formPath}.${i}`} index={i}>
-                      {(provided, snapshot) => (
-                        <ListItem
-                          key={field.id}
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          disablePadding
-                          sx={{ display: "block" }}
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId={props.formPath}>
+            {(provided) => (
+              <List disablePadding ref={provided.innerRef} {...provided.droppableProps}>
+                {fields.map((field, i) => (
+                  <Draggable draggableId={`${props.formPath}.${i}`} index={i} key={field.id}>
+                    {(provided, snapshot) => (
+                      <ListItem ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} disablePadding sx={{ display: "block" }}>
+                        <Stack
+                          sx={{
+                            backgroundColor: (theme) => (snapshot.isDragging ? theme.palette.background.paper : undefined),
+                            boxShadow: (theme) => (snapshot.isDragging ? undefined : theme.shadows[0]),
+                          }}
                         >
-                          <Stack
-                            sx={{
-                              backgroundColor: (theme) => (snapshot.isDragging ? theme.palette.background.paper : undefined),
-                              boxShadow: (theme) => (snapshot.isDragging ? undefined : theme.shadows[0]),
-                            }}
-                          >
-                            <MemberSorting
-                              formPath={`${props.formPath}.${i}`}
-                              availableMembers={props.availableMembers}
-                              handleDelete={() => handleSortingDelete(i)}
-                            />
-                            {fields.length - 1 !== i ? <Divider flexItem /> : null}
-                          </Stack>
-                        </ListItem>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-        </List>
+                          <MemberSorting
+                            formPath={`${props.formPath}.${i}`}
+                            availableMembers={props.availableMembers}
+                            handleDelete={() => handleSortingDelete(i)}
+                          />
+                          {fields.length - 1 !== i ? <Divider flexItem /> : null}
+                        </Stack>
+                      </ListItem>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </List>
+            )}
+          </Droppable>
+        </DragDropContext>
       </Stack>
     </CssGrid>
   );

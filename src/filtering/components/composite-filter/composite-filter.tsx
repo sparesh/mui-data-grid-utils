@@ -1,10 +1,8 @@
 import React from "react";
 
-import { IconButton, Typography, Divider, Stack, Box, Tooltip, ListItem, List } from "@mui/material";
+import { IconButton, Typography, Divider, Stack, Box, Tooltip, ListItem, List, SvgIcon } from "@mui/material";
 
-import CloseIcon from "@mui/icons-material/CloseOutlined";
-
-import Icon from "@mdi/react";
+import { CloseOutlined } from "@mui/icons-material";
 
 import { mdiFilterPlusOutline } from "@mdi/js";
 import { mdiTableColumnPlusAfter } from "@mdi/js";
@@ -87,6 +85,8 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
     append(compositeFactory.create());
   };
 
+  console.log(mdiTableColumnPlusAfter);
+
   return (
     <CssGrid sx={{ gridTemplateColumns: "auto auto" }}>
       <Stack sx={{ gridColumn: "span 2" }}>
@@ -105,7 +105,7 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
               <Box>
                 <Tooltip title="Delete filter">
                   <IconButton size="small" onClick={props.handleDelete}>
-                    <CloseIcon fontSize="inherit" />
+                    <CloseOutlined fontSize="inherit" />
                   </IconButton>
                 </Tooltip>
               </Box>
@@ -119,12 +119,16 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
           <Stack direction="row" sx={{ paddingX: 1 }}>
             <Tooltip title="Add member filter">
               <IconButton size="small" onClick={handleAddMemberFilter}>
-                <Icon path={mdiTableColumnPlusAfter} size={0.75} />
+                <SvgIcon fontSize="inherit">
+                  <path d={mdiTableColumnPlusAfter} />
+                </SvgIcon>
               </IconButton>
             </Tooltip>
             <Tooltip title="Add composite filter">
               <IconButton size="small" onClick={handleAddCompositeFilter}>
-                <Icon path={mdiFilterPlusOutline} size={0.75} />
+                <SvgIcon fontSize="inherit">
+                  <path d={mdiFilterPlusOutline} />
+                </SvgIcon>
               </IconButton>
             </Tooltip>
           </Stack>
