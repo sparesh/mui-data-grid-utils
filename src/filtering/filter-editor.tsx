@@ -8,12 +8,14 @@ import { CompositeFilter } from "./components/composite-filter/composite-filter"
 import { CompositeFilterDescriptor } from "./filter-descriptors/composite-filter-descriptor";
 import { CompositeFilterOperator } from "./enums/composite-filter-operator";
 import { Member } from "../common/member";
+import { CompositeFilterContext, createContextValue } from "./context/composite-filter-context";
 
 export interface FilterEditorProps {
   handleSubmit?: (filter: CompositeFilterDescriptor) => void;
   handleClose: () => void;
 
   anchorEl: HTMLElement | null;
+  formGroupId: string;
   availableMembers: Member[];
   initialFilter?: CompositeFilterDescriptor | undefined;
 }
@@ -50,9 +52,11 @@ export const FilterEditor = (props: FilterEditorProps) => {
       <Stack sx={{ width: "max-content" }}>
         <FormProvider {...methods}>
           <form onSubmit={onSubmit}>
-            <List disablePadding>
-              <CompositeFilter indent={0} formPath={"rootFilter"} availableMembers={props.availableMembers} />
-            </List>
+            <CompositeFilterContext.Provider value={createContextValue()}>
+              <List disablePadding>
+                <CompositeFilter indent={0} formPath={"rootFilter"} formGroupId={props.formGroupId} availableMembers={props.availableMembers} />
+              </List>
+            </CompositeFilterContext.Provider>
             <Button
               size="large"
               variant="contained"

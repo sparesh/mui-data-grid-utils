@@ -174,7 +174,14 @@ const FilteringApp = () => {
         Open Filter
       </Button>
 
-      <FilterEditor anchorEl={anchorEl} initialFilter={rootFilter} availableMembers={availableMembers} handleClose={handleClose} handleSubmit={setJson} />
+      <FilterEditor
+        anchorEl={anchorEl}
+        formGroupId={"users-filter-group"}
+        initialFilter={rootFilter}
+        availableMembers={availableMembers}
+        handleClose={handleClose}
+        handleSubmit={setJson}
+      />
 
       <Paper sx={{ marginY: 2, padding: 1 }}>
         <Paper
@@ -185,7 +192,9 @@ const FilteringApp = () => {
         >
           <Typography variant="h5">Filtering State</Typography>
         </Paper>
-        <pre>{JSON.stringify(json, null, 2)}</pre>
+        <pre style={{ maxWidth: "50vw", overflow: "clip" }}>
+          {JSON.stringify(json, null, 2)}
+        </pre>
       </Paper>
     </div>
   );
@@ -217,7 +226,13 @@ const SortingApp = () => {
         Open Sorting
       </Button>
 
-      <SortingEditor anchorEl={anchorEl} initialSorting={rootSorting} availableMembers={availableMembers} handleClose={handleClose} handleSubmit={setJson} />
+      <SortingEditor
+        anchorEl={anchorEl}
+        initialSorting={rootSorting}
+        availableMembers={availableMembers}
+        handleClose={handleClose}
+        handleSubmit={setJson}
+      />
 
       <Paper sx={{ marginY: 2, padding: 1 }}>
         <Paper
@@ -228,26 +243,34 @@ const SortingApp = () => {
         >
           <Typography variant="h5">Sorting State</Typography>
         </Paper>
-        <pre>{JSON.stringify(json, null, 2)}</pre>
+        <pre style={{ maxWidth: "50vw", overflow: "clip" }}>
+          {JSON.stringify(json, null, 2)}
+        </pre>
       </Paper>
     </div>
   );
 };
 
+const DataGridApp = () => {
+  return <></>;
+};
+
 export default function App() {
   return (
-    <Stack
-      direction="row"
-      justifyContent="space-evenly"
-      // alignItems="center"
-      sx={{
-        width: 1,
-        height: "100vh",
-        padding: 2,
-      }}
-    >
-      <FilteringApp />
-      <SortingApp />
+    <Stack>
+      <Stack
+        direction="row"
+        justifyContent="space-evenly"
+        sx={{
+          width: 1,
+          padding: 2,
+        }}
+      >
+        <FilteringApp />
+        <SortingApp />
+      </Stack>
+
+      <DataGridApp />
     </Stack>
   );
 }
