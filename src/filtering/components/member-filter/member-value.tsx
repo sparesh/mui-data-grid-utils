@@ -3,7 +3,13 @@ import React from "react";
 import { Box, MenuItem, Select, TextField } from "@mui/material";
 import DateAdapter from "@mui/lab/AdapterMoment";
 
-import { Controller, ControllerRenderProps, FieldValues, useFormContext, useWatch } from "react-hook-form";
+import {
+  Controller,
+  ControllerRenderProps,
+  FieldValues,
+  useFormContext,
+  useWatch,
+} from "react-hook-form";
 import { MobileDateTimePicker, LocalizationProvider } from "@mui/lab";
 import { MemberType } from "../../../common/member";
 
@@ -22,7 +28,12 @@ interface GenericInputOptions {
 }
 
 class FilterValueComponentFactory {
-  static createGenericInput(options?: GenericInputOptions | ((props: FilterValueComponentProps) => GenericInputOptions) | undefined) {
+  static createGenericInput(
+    options?:
+      | GenericInputOptions
+      | ((props: FilterValueComponentProps) => GenericInputOptions)
+      | undefined
+  ) {
     return (props: FilterValueComponentProps) => {
       const calculatedOptions = typeof options === "function" ? options(props) : options;
 
@@ -49,7 +60,9 @@ const memberTypeToFilterValueComponentMapping: { [key: string]: FilterValueCompo
     type: props.predeterminedValue ? undefined : "number",
   })),
   [Date.name]: (props: FilterValueComponentProps) => {
-    const [GenericInput] = React.useState(() => FilterValueComponentFactory.createGenericInput());
+    const [GenericInput] = React.useState(() =>
+      FilterValueComponentFactory.createGenericInput()
+    );
 
     return (
       <>
@@ -91,14 +104,24 @@ const memberTypeToFilterValueComponentMapping: { [key: string]: FilterValueCompo
     );
   },
   [Boolean.name]: (props: FilterValueComponentProps) => {
-    const [GenericInput] = React.useState(() => FilterValueComponentFactory.createGenericInput());
+    const [GenericInput] = React.useState(() =>
+      FilterValueComponentFactory.createGenericInput()
+    );
 
     return (
       <>
         {props.predeterminedValue ? (
           <GenericInput {...props} />
         ) : (
-          <Select autoWidth variant="standard" size="small" disableUnderline disabled={props.disabled} sx={{ width: 1 }} {...props.field}>
+          <Select
+            autoWidth
+            variant="standard"
+            size="small"
+            disableUnderline
+            disabled={props.disabled}
+            sx={{ width: 1 }}
+            {...props.field}
+          >
             <MenuItem dense value={"true"}>
               True
             </MenuItem>
@@ -120,11 +143,16 @@ export interface MemberFilterValueProps {
 }
 
 export const MemberFilterValue = (props: MemberFilterValueProps) => {
-  const [FilterValueComponent, setFilterValueComponent] = React.useState(() => memberTypeToFilterValueComponentMapping.defaultInput);
+  const [FilterValueComponent, setFilterValueComponent] = React.useState(
+    () => memberTypeToFilterValueComponentMapping.defaultInput
+  );
 
   const { control, setValue } = useFormContext();
 
-  const memberType: MemberType = useWatch({ control, name: `${props.parentFormPath}.member.type` });
+  const memberType: MemberType = useWatch({
+    control,
+    name: `${props.parentFormPath}.member.type`,
+  });
   const isDisabled: boolean = useWatch({
     control,
     name: `${props.parentFormPath}.member.isDisabled`,
@@ -136,8 +164,14 @@ export const MemberFilterValue = (props: MemberFilterValueProps) => {
   });
 
   React.useEffect(() => {
+    if (!memberType) {
+      return;
+    }
+
     if (Object.keys(memberTypeToFilterValueComponentMapping).includes(memberType.typeName)) {
-      setFilterValueComponent(() => memberTypeToFilterValueComponentMapping[memberType.typeName]);
+      setFilterValueComponent(
+        () => memberTypeToFilterValueComponentMapping[memberType.typeName]
+      );
     } else {
       setFilterValueComponent(() => memberTypeToFilterValueComponentMapping.defaultInput);
     }
@@ -153,7 +187,12 @@ export const MemberFilterValue = (props: MemberFilterValueProps) => {
     <Controller
       name={props.formPath}
       render={({ field }) => (
-        <FilterValueComponent field={field} multilineValue={props.multilineValue} disabled={Boolean(isDisabled)} predeterminedValue={predeterminedValue} />
+        <FilterValueComponent
+          field={field}
+          multilineValue={props.multilineValue}
+          disabled={Boolean(isDisabled)}
+          predeterminedValue={predeterminedValue}
+        />
       )}
     />
   );

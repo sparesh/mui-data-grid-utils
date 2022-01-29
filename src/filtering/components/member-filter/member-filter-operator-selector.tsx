@@ -2,7 +2,13 @@ import React from "react";
 
 import { Select, MenuItem } from "@mui/material";
 
-import { Controller, ControllerRenderProps, FieldValues, useFormContext, useWatch } from "react-hook-form";
+import {
+  Controller,
+  ControllerRenderProps,
+  FieldValues,
+  useFormContext,
+  useWatch,
+} from "react-hook-form";
 
 import { MemberFilterOperator } from "../../enums/member-filter-operator";
 import { MemberType } from "../../../common/member";
@@ -187,7 +193,12 @@ const memberTypeToFilterOperatorsMapping = {
     initialFilterOperators[11],
     initialFilterOperators[12],
   ],
-  [Boolean.name]: [initialFilterOperators[2], initialFilterOperators[3], initialFilterOperators[11], initialFilterOperators[12]],
+  [Boolean.name]: [
+    initialFilterOperators[2],
+    initialFilterOperators[3],
+    initialFilterOperators[11],
+    initialFilterOperators[12],
+  ],
 };
 
 export const MemberFilterOperatorSelector = (props: FilterOperationSelectorProps) => {
@@ -195,9 +206,16 @@ export const MemberFilterOperatorSelector = (props: FilterOperationSelectorProps
 
   const { control, setValue } = useFormContext();
 
-  const memberType: MemberType = useWatch({ control, name: `${props.parentFormPath}.member.type` });
+  const memberType: MemberType = useWatch({
+    control,
+    name: `${props.parentFormPath}.member.type`,
+  });
 
   React.useEffect(() => {
+    if (!memberType) {
+      return;
+    }
+
     if (Object.keys(memberTypeToFilterOperatorsMapping).includes(memberType.typeName)) {
       setFilterOperators(memberTypeToFilterOperatorsMapping[memberType.typeName]);
     } else {
@@ -205,12 +223,23 @@ export const MemberFilterOperatorSelector = (props: FilterOperationSelectorProps
     }
   }, [memberType]);
 
-  const handleFilterOperatorSelected = (event: any, field: ControllerRenderProps<FieldValues, string>) => {
-    const selectedOperator = filterOperators.find((operator) => operator.value === event.target.value);
+  const handleFilterOperatorSelected = (
+    event: any,
+    field: ControllerRenderProps<FieldValues, string>
+  ) => {
+    const selectedOperator = filterOperators.find(
+      (operator) => operator.value === event.target.value
+    );
 
-    setValue(`${props.parentFormPath}.member.isDisabled`, !selectedOperator?.additionalInfo.modifiableValue);
+    setValue(
+      `${props.parentFormPath}.member.isDisabled`,
+      !selectedOperator?.additionalInfo.modifiableValue
+    );
 
-    setValue(`${props.parentFormPath}.member.predeterminedValue`, selectedOperator?.additionalInfo.predeterminedValue);
+    setValue(
+      `${props.parentFormPath}.member.predeterminedValue`,
+      selectedOperator?.additionalInfo.predeterminedValue
+    );
 
     field.onChange(event);
   };

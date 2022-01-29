@@ -33,9 +33,10 @@ const saveFilterFormSchema = yup
 
 export interface SavePartialFilterModalProps {
   handleClose: () => void;
-  handleFoldOriginalFilter: (id: string) => void;
+  handleFoldOriginalFilter: (filterId: string) => void;
 
   formGroupId: string;
+  parentFormPath: string;
   formPath: string;
   open: boolean;
 }
@@ -54,6 +55,11 @@ export const SavePartialFilterModal = (props: SavePartialFilterModalProps) => {
 
   const [foldOriginalFilter, setFoldOriginalFilter] = React.useState(true);
 
+  const handleCancel = () => {
+    reset();
+    props.handleClose();
+  };
+
   const onSubmit = (partialFilter: PartialFilterDescriptor<CompositeFilterDescriptor>) => {
     partialFilter.filter = getValues(props.formPath);
     partialFilter.filterGroupId = props.formGroupId;
@@ -61,6 +67,7 @@ export const SavePartialFilterModal = (props: SavePartialFilterModalProps) => {
     const filterId = compositeFilterContext.saveFilter(partialFilter);
 
     reset();
+    setFoldOriginalFilter(true);
     props.handleClose();
 
     if (foldOriginalFilter) {
@@ -128,7 +135,7 @@ export const SavePartialFilterModal = (props: SavePartialFilterModalProps) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={props.handleClose}>Cancel</Button>
+          <Button onClick={handleCancel}>Cancel</Button>
           <Button onClick={handleSubmit(onSubmit)}>Save</Button>
         </DialogActions>
       </form>

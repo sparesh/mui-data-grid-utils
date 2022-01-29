@@ -8,7 +8,10 @@ import { CompositeFilter } from "./components/composite-filter/composite-filter"
 import { CompositeFilterDescriptor } from "./filter-descriptors/composite-filter-descriptor";
 import { CompositeFilterOperator } from "./enums/composite-filter-operator";
 import { Member } from "../common/member";
-import { CompositeFilterContext, createContextValue } from "./context/composite-filter-context";
+import {
+  CompositeFilterContext,
+  createContextValue,
+} from "./context/composite-filter-context";
 
 export interface FilterEditorProps {
   handleSubmit?: (filter: CompositeFilterDescriptor) => void;
@@ -54,7 +57,12 @@ export const FilterEditor = (props: FilterEditorProps) => {
           <form onSubmit={onSubmit}>
             <CompositeFilterContext.Provider value={createContextValue()}>
               <List disablePadding>
-                <CompositeFilter indent={0} formPath={"rootFilter"} formGroupId={props.formGroupId} availableMembers={props.availableMembers} />
+                <CompositeFilter
+                  indent={0}
+                  formPath={"rootFilter"}
+                  formGroupId={props.formGroupId}
+                  availableMembers={props.availableMembers}
+                />
               </List>
             </CompositeFilterContext.Provider>
             <Button

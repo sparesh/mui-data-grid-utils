@@ -17,9 +17,8 @@ import { CloseOutlined, DownloadOutlined, UploadOutlined } from "@mui/icons-mate
 import { mdiFilterPlusOutline } from "@mdi/js";
 import { mdiTableColumnPlusAfter } from "@mdi/js";
 
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { useFormContext, useFieldArray, useWatch } from "react-hook-form";
 
-import { FilterDescriptor } from "../../filter-descriptors/filter-descriptor";
 import { CompositeFilterDescriptor } from "../../filter-descriptors/composite-filter-descriptor";
 import { MemberFilterDescriptor } from "../../filter-descriptors/member-filter-descriptor";
 import { CompositeFilterOperator } from "../../enums/composite-filter-operator";
@@ -60,7 +59,7 @@ class CompositeFilterDescriptorFactory {
 
 export interface CompositeFilterProps {
   handleDelete?: () => void;
-  handleFold?: (id: string) => void;
+  handleFold?: (filterId: string) => void;
 
   indent?: number;
   formGroupId: string;
@@ -78,14 +77,13 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
   const [saveFilterOpen, setSaveFilterOpen] = React.useState(false);
   const [loadFilterOpen, setLoadFilterOpen] = React.useState(false);
 
-  const compositeFilterContext = useCompositeFilterContext();
-  const { control, getValues } = useFormContext();
+  const { control } = useFormContext();
   const { fields, append, remove, insert, update } = useFieldArray({
     control,
     name: `${props.formPath}.filters`,
   });
+  const compositeFilterContext = useCompositeFilterContext();
 
-  const filters: FilterDescriptor[] = getValues(`${props.formPath}.filters`);
   const indent = props.indent || 0;
 
   const handleFilterDelete = (deletedIndex: number) => {
@@ -93,10 +91,8 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
   };
 
   const handleAddMemberFilter = () => {
-    const compositeFilters = filters.filter((filter) =>
-      Object.keys(filter).includes("filters")
-    );
-    const memberFilters = filters.filter((filter) => !compositeFilters.includes(filter));
+    const compositeFilters = fields.filter((field) => Object.keys(field).includes("filters"));
+    const memberFilters = fields.filter((field) => !compositeFilters.includes(field));
 
     const newMemberFilter = memberFactory.create();
 
@@ -133,12 +129,12 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
     setLoadFilterOpen(false);
   };
 
-  const handleFoldSelf = (id: string) => {
-    props.handleFold?.call(undefined, id);
+  const handleFoldSelf = (filterId: string) => {
+    props.handleFold?.call(undefined, filterId);
   };
 
-  const handleFoldChild = (foldedIndex: number, id: string) => {
-    const filter = compositeFilterContext.loadFilter(props.formGroupId, id);
+  const handleFoldChild = (foldedIndex: number, filterId: string) => {
+    const filter = compositeFilterContext.loadFilter(props.formGroupId, filterId);
 
     update(foldedIndex, filter);
   };
@@ -182,11 +178,13 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
                   <UploadOutlined fontSize="inherit" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Save composite filter">
-                <IconButton size="small" onClick={handleOpenSaveFilter}>
-                  <DownloadOutlined fontSize="inherit" />
-                </IconButton>
-              </Tooltip>
+              {indent > 0 ? (
+                <Tooltip title="Save composite filter">
+                  <IconButton size="small" onClick={handleOpenSaveFilter}>
+                    <DownloadOutlined fontSize="inherit" />
+                  </IconButton>
+                </Tooltip>
+              ) : undefined}
               <Tooltip title="Add member filter">
                 <IconButton size="small" onClick={handleAddMemberFilter}>
                   <SvgIcon fontSize="inherit">
@@ -217,18 +215,15 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
             gridAutoRows: "row",
           }}
         >
-          {!filters.length &&
-          filters.every((filter) => Object.keys(filter).includes("filters")) ? (
+          {!fields.length ? (
             <Box sx={{ padding: 1 }}>
               <NoAppliedFilter />
             </Box>
-          ) : null}
+          ) : undefined}
           {fields.map((field, i) => {
-            if (i >= filters.length) {
-              return undefined;
-            }
+            console.log(field, i);
 
-            if (Object.keys(filters[i]).includes("filters")) {
+            if (Object.keys(field).includes("filters")) {
               return (
                 <ListItem key={field.id} disablePadding sx={{ display: "block" }}>
                   <List disablePadding>
@@ -238,20 +233,19 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
                       formPath={`${props.formPath}.filters.${i}`}
                       availableMembers={props.availableMembers}
                       handleDelete={() => handleFilterDelete(i)}
-                      handleFold={(id) => handleFoldChild(i, id)}
+                      handleFold={(filterId) => handleFoldChild(i, filterId)}
                     />
                   </List>
                 </ListItem>
               );
-            } else if (Object.keys(filters[i]).includes("name")) {
+            } else if (Object.keys(field).includes("name")) {
               return (
                 <ListItem key={field.id} disablePadding sx={{ display: "block" }}>
                   <PartialFilter
-                    formGroupId={props.formGroupId}
-                    formPath={`${props.formPath}.filters.${i}`}
+                    filter={field as any}
                     handleDelete={() => handleFilterDelete(i)}
                   />
-                  {filters.length - 1 !== i ? <Divider flexItem /> : null}
+                  {fields.length - 1 !== i ? <Divider flexItem /> : null}
                 </ListItem>
               );
             } else {
@@ -262,20 +256,23 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
                     handleDelete={() => handleFilterDelete(i)}
                     availableMembers={props.availableMembers}
                   />
-                  {filters.length - 1 !== i ? <Divider flexItem /> : null}
+                  {fields.length - 1 !== i ? <Divider flexItem /> : null}
                 </ListItem>
               );
             }
           })}
         </Stack>
       </CssGrid>
-      <SavePartialFilterModal
-        formPath={props.formPath}
-        formGroupId={props.formGroupId}
-        open={saveFilterOpen}
-        handleClose={handleCloseSaveFilter}
-        handleFoldOriginalFilter={handleFoldSelf}
-      />
+      {indent > 0 ? (
+        <SavePartialFilterModal
+          parentFormPath={props.formPath.split(".").slice(0, -1).join(".")}
+          formPath={props.formPath}
+          formGroupId={props.formGroupId}
+          open={saveFilterOpen}
+          handleClose={handleCloseSaveFilter}
+          handleFoldOriginalFilter={handleFoldSelf}
+        />
+      ) : undefined}
       <LoadPartialFilterModal
         formGroupId={props.formGroupId}
         open={loadFilterOpen}
