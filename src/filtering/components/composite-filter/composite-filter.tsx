@@ -221,8 +221,6 @@ export const CompositeFilter = (props: CompositeFilterProps) => {
             </Box>
           ) : undefined}
           {fields.map((field, i) => {
-            console.log(field, i);
-
             if (Object.keys(field).includes("filters")) {
               return (
                 <ListItem key={field.id} disablePadding sx={{ display: "block" }}>

@@ -169,7 +169,7 @@ const FilteringApp = () => {
   const [json, setJson] = React.useState<any>(rootFilter);
 
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <Button variant="contained" onClick={handleClick}>
         Open Filter
       </Button>
@@ -221,7 +221,7 @@ const SortingApp = () => {
   const [json, setJson] = React.useState<any>(rootSorting);
 
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <Button variant="contained" onClick={handleClick}>
         Open Sorting
       </Button>
@@ -264,6 +264,7 @@ export default function App() {
         sx={{
           width: 1,
           padding: 2,
+          flexWrap: "wrap",
         }}
       >
         <FilteringApp />
